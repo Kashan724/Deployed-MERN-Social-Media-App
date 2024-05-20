@@ -64,7 +64,8 @@ app.get('*',(req,res)=>res.sendFile(path.join(__dirname,'/client/build/index.htm
 
 
   /* MONGOOSE SETUP */
-const PORT = process.env.PORT || 6001;
+//const PORT = process.env.PORT || 6001;
+  const PORT =  6001;
 mongoose
   .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
