@@ -29,25 +29,26 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
+//app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
-/* CONTENT SECURITY POLICY */
-const cspDirectives = {
-  defaultSrc: ["'self'"],
-  connectSrc: ["'self'", "http://localhost:6001", "https://social-media-app-tawny.vercel.app"],
-  scriptSrc: ["'self'"],
-  styleSrc: ["'self'", "https://fonts.googleapis.com"],
-  imgSrc: ["'self'", "data:"],
-  fontSrc: ["'self'", "https:", "data:"],
+const corsOptions = {
+  // origin: "http://localhost:5173",
+  origin: (origin, callback) => {
+    // Check if the origin is allowed
+    const allowedOrigins = [
+      "https://social-media-jpuxhrh2j-muhammad-kashans-projects-cfb4e24a.vercel.app/",
+      "https://social-media-app-two-mu.vercel.app/",
+    ];
+    const isAllowed = allowedOrigins.includes(origin);
+    callback(null, isAllowed ? origin : false);
+  },
+  methods: "GET, POST, PUT, DELETE, PATCH, HEAD",
+  credentials: true,
 };
 
+app.use(cors(corsOptions));
 
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: cspDirectives,
-  })
-);
 
 /* FILE STORAGE */
 const storage = multer.diskStorage({
