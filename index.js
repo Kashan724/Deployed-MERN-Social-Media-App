@@ -18,10 +18,6 @@ import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
 
-
-
-
-
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,46 +32,62 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
+/* CONTENT SECURITY POLICY */
+const cspDirectives = {
+  defaultSrc: ["'self'"],
+  connectSrc: ["'self'", "http://localhost:6001", "https://social-media-app-tawny.vercel.app"],
+  scriptSrc: ["'self'"],
+  styleSrc: ["'self'", "'unsafe-inline'"],
+  imgSrc: ["'self'", "data:"],
+  fontSrc: ["'self'", "https:", "data:"], // Fix here
+};
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: cspDirectives,
+  })
+);
+
 /* FILE STORAGE */
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, "public/assets");
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  });
-  const upload = multer({ storage });
+  destination: function (req, file, cb) {
+    cb(null, "public/assets");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage });
 
-  /* ROUTES WITH FILES */
+/* ROUTES WITH FILES */
 app.post("/auth/register", upload.single("picture"), register);
-app.post("/posts",verifyToken,  upload.single("picture"), createPost);
+app.post("/posts", verifyToken, upload.single("picture"), createPost);
 
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
-app.use("/posts",postRoutes);
+app.use("/posts", postRoutes);
 
-// use the client app
-app.use(express.static(path.join(__dirname,'/client/build')))
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '/client/build')));
 
-// render client for any path
-app.get('*',(req,res)=>res.sendFile(path.join(__dirname,'/client/build/index.html')))
+// Render client for any path
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/client/build/index.html'));
+});
 
-
-  /* MONGOOSE SETUP */
-const PORT = process.env.PORT || 6001;
+/* MONGOOSE SETUP */
+const PORT =  6001;
 mongoose
   .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
-
-    /* ADD DATA ONE TIME */
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    // Uncomment these lines if you need to seed your database
     // User.insertMany(users);
-     //Post.insertMany(posts);
-
+    // Post.insertMany(posts);
   })
   .catch((error) => console.log(`${error} did not connect`));
+
