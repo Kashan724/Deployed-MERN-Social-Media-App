@@ -37,10 +37,11 @@ const cspDirectives = {
   defaultSrc: ["'self'"],
   connectSrc: ["'self'", "http://localhost:6001", "https://social-media-app-tawny.vercel.app"],
   scriptSrc: ["'self'"],
-  styleSrc: ["'self'", "'unsafe-inline'"],
+  styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
   imgSrc: ["'self'", "data:"],
-  fontSrc: ["'self'", "https:", "data:"], // Fix here
+  fontSrc: ["'self'", "https:", "data:"],
 };
+
 
 app.use(
   helmet.contentSecurityPolicy({
