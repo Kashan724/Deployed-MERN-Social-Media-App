@@ -35,9 +35,9 @@ app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 /* CONTENT SECURITY POLICY */
 const cspDirectives = {
   defaultSrc: ["'self'"],
-  connectSrc: ["'self'", "http://localhost:6001", "https://social-media-app-tawny.vercel.app"],
+  connectSrc: ["'self'", "http://localhost:6001", "https://social-media-app-two-mu.vercel.app"],
   scriptSrc: ["'self'"],
-  styleSrc: ["'self'", "https://fonts.googleapis.com"],
+  styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
   imgSrc: ["'self'", "data:"],
   fontSrc: ["'self'", "https:", "data:"],
 };
