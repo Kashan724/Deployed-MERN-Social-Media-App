@@ -56,68 +56,70 @@ const Form = () => {
   const isRegister = pageType === "register";
 
   const register = async (values, onSubmitProps) => {
-    // This allows us to send form info with image
+    // Log the form values before sending the request
+    console.log("Register Form Values:", values);
+
     const formData = new FormData();
     for (let value in values) {
-      formData.append(value, values[value]);
+        formData.append(value, values[value]);
     }
     formData.append("picturePath", values.picture.name);
 
     try {
-      const savedUserResponse = await fetch(
-        `${window.location.origin}/auth/register`,
-        {
-          method: "POST",
-          body: formData,
+        const savedUserResponse = await fetch(`${window.location.origin}/auth/register`, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!savedUserResponse.ok) {
+            const text = await savedUserResponse.text();
+            console.error("Error response:", text);
+            throw new Error(`HTTP error! status: ${savedUserResponse.status}`);
         }
-      );
 
-      if (!savedUserResponse.ok) {
-        const text = await savedUserResponse.text();
-        console.error("Error response:", text);
-        throw new Error(`HTTP error! status: ${savedUserResponse.status}`);
-      }
+        const savedUser = await savedUserResponse.json();
+        onSubmitProps.resetForm();
 
-      const savedUser = await savedUserResponse.json();
-      onSubmitProps.resetForm();
-
-      if (savedUser) {
-        setPageType("login");
-      }
+        if (savedUser) {
+            setPageType("login");
+        }
     } catch (error) {
-      console.error("Error during registration:", error);
+        console.error("Error during registration:", error);
     }
-  };
+};
 
-  const login = async (values, onSubmitProps) => {
+const login = async (values, onSubmitProps) => {
+    // Log the login form values before sending the request
+    console.log("Login Form Values:", values);
+
     try {
-      const loggedInResponse = await fetch(`${window.location.origin}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
+        const loggedInResponse = await fetch(`${window.location.origin}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(values),
+        });
 
-      if (!loggedInResponse.ok) {
-        const text = await loggedInResponse.text();
-        console.error("Error response:", text);
-        throw new Error(`HTTP error! status: ${loggedInResponse.status}`);
-      }
+        if (!loggedInResponse.ok) {
+            const text = await loggedInResponse.text();
+            console.error("Error response:", text);
+            throw new Error(`HTTP error! status: ${loggedInResponse.status}`);
+        }
 
-      const loggedIn = await loggedInResponse.json();
-      onSubmitProps.resetForm();
-      if (loggedIn) {
-        dispatch(
-          setLogin({
-            user: loggedIn.user,
-            token: loggedIn.token,
-          })
-        );
-        navigate("/home");
-      }
+        const loggedIn = await loggedInResponse.json();
+        onSubmitProps.resetForm();
+        if (loggedIn) {
+            dispatch(
+                setLogin({
+                    user: loggedIn.user,
+                    token: loggedIn.token,
+                })
+            );
+            navigate("/home");
+        }
     } catch (error) {
-      console.error("Error during login:", error);
+        console.error("Error during login:", error);
     }
-  };
+};
 
   const handleFormSubmit = async (values, onSubmitProps) => {
     if (isLogin) await login(values, onSubmitProps);
